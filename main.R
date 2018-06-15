@@ -71,3 +71,34 @@ ggplot(data, aes(x=data$danceability, y=data$speechiness, fill=factor(data$key))
   geom_smooth(method=lm,   # Add linear regression lines
               se=FALSE)    # Don't add shaded confidence region
 
+
+spfree<-speechiness[which(speechiness<quantile(speechiness,0.96))];
+library(classInt)
+tab <- classIntervals(spfree, n=11, style='jenks', intervalClosure = 'right');
+jenks.tests(tab)
+boxplot(spfree, col='lightblue')
+
+
+
+lol<-lm(speechiness ~danceability+valence+energy+key+loudness+mode+
+          speechiness+acousticness+instrumentalness+liveness+tempo, data=data)
+step(lol, direction = "both")
+x<-lm(formula = speechiness ~ danceability + energy + loudness + 
+        instrumentalness + tempo, data = data)
+summary(x)
+install.packages("effects")
+library(effects)
+plot(allEffects(x, residual=TRUE), strip.background='red')
+
+library(car)
+crPlots(x)
+
+df = mtcars
+
+lm_fit <- lm(mpg ~ cyl + hp, data=df)
+summary(lm_fit)
+
+#predicted_df <- data.frame(mpg_pred = predict(x, eh), y=danceability)
+#ggplot(data = eh, aes(x = speechiness, y=danceability)) + 
+#geom_point(color='blue') +
+#geom_line(color='red',data = predicted_df, aes(x=mpg_pred))
